@@ -1,0 +1,51 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "C:/Users/shrey/Downloads/com.seanba.super-tiled2unity/Samples~/Aseprite/TMX_numbers.tmx",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "C:/Users/shrey/Downloads/com.seanba.super-tiled2unity/Samples~/Aseprite/TMX_numbers.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 38.5,
+                "y": 52.5
+            }
+        },
+        "C:/Users/shrey/Downloads/com.seanba.super-tiled2unity/Samples~/Aseprite/TSX_numbers.tsx": {
+            "scaleInDock": 1
+        },
+        "pixel.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "untitled.tmx": {
+            "scale": 0.125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 116,
+                "y": -36
+            }
+        }
+    },
+    "last.exportedFilePath": "C:/Users/shrey/OneDrive/Desktop/GJL_GP/Assets/MAP",
+    "last.imagePath": "C:/Users/shrey/OneDrive/Pictures",
+    "map.fixedSize": false,
+    "map.lastUsedExportFilter": "All Files (*)",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "untitled.tmx",
+        "pixel.tsx",
+        "C:/Users/shrey/Downloads/com.seanba.super-tiled2unity/Samples~/Aseprite/TMX_numbers.tmx"
+    ],
+    "project": "map1.tiled-project",
+    "recentFiles": [
+        "untitled.tmx",
+        "pixel.tsx",
+        "C:/Users/shrey/Downloads/com.seanba.super-tiled2unity/Samples~/Aseprite/TMX_numbers.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}
