@@ -261,9 +261,14 @@ public class DynamiteZombieAI : MonoBehaviour
     {
         Debug.Log($"Dynamite Zombie exploded at {transform.position}!");
 
-        // Here you would add explosion effects, particle systems, etc.
-        // For now, just destroy the zombie
+        // Create explosion effect
+        GameObject explosionPrefab = CreateExplosionEffect();
+        if (explosionPrefab != null)
+        {
+            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        }
 
+        // Notify spawner and destroy zombie
         if (spawner != null)
         {
             spawner.OnZombieDespawned(gameObject, MultiZombieSpawner.ZombieType.Dynamite);
@@ -271,6 +276,42 @@ public class DynamiteZombieAI : MonoBehaviour
 
         Destroy(gameObject);
     }
+
+    GameObject CreateExplosionEffect()
+    {
+        // Create explosion GameObject
+        GameObject explosion = new GameObject("DynamiteExplosion");
+        explosion.transform.position = transform.position;
+
+        // Add SpriteRenderer
+        SpriteRenderer explosionRenderer = explosion.AddComponent<SpriteRenderer>();
+        explosionRenderer.sortingLayerName = "Default";
+        explosionRenderer.sortingOrder = 10;
+
+        // Add ExplosionEffect script
+        ExplosionEffect explosionEffect = explosion.AddComponent<ExplosionEffect>();
+
+        // Try to load explosion sprites
+        Sprite[] explosionSprites = Resources.LoadAll<Sprite>("Effects/Explosion_Dynamite");
+        if (explosionSprites.Length == 0)
+        {
+            // Fallback: try to load from the Effects folder
+            explosionSprites = new Sprite[]
+            {
+            Resources.Load<Sprite>("Effects/Explosion_Dynamite/explosion1"),
+            Resources.Load<Sprite>("Effects/Explosion_Dynamite/explosion2"),
+            Resources.Load<Sprite>("Effects/Explosion_Dynamite/explosion3"),
+            Resources.Load<Sprite>("Effects/Explosion_Dynamite/explosion4")
+            };
+        }
+
+        explosionEffect.explosionSprites = explosionSprites;
+        explosionEffect.explosionRadius = explosionRadius;
+        explosionEffect.explosionDamage = explosionDamage;
+
+        return explosion;
+    }
+
 
     void SetState(ZombieState newState)
     {
