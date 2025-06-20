@@ -158,6 +158,60 @@ Transform:
   - {fileID: 81845407}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &464286570
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 464286572}
+  - component: {fileID: 464286571}
+  m_Layer: 0
+  m_Name: ZombieAnimationController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &464286571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464286570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8e80d911ebdb544a637d6c3afc54dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 0}
+  zombieType: Normal
+  deathAnimationDuration: 2
+  deathEffect: {fileID: 0}
+  deathSound: {fileID: 0}
+--- !u!4 &464286572
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464286570}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -10.3325, y: 4.06286, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &497958239 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1722859942990277956, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
+  m_PrefabInstance: {fileID: 1350473396575304455}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -338,7 +392,7 @@ GameObject:
   - component: {fileID: 619394802}
   - component: {fileID: 619394801}
   m_Layer: 0
-  m_Name: Global Light 2D
+  m_Name: FinalPointLight2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -359,9 +413,9 @@ MonoBehaviour:
   m_ComponentVersion: 2
   m_LightType: 3
   m_BlendStyleIndex: 0
-  m_FalloffIntensity: 0.5
+  m_FalloffIntensity: 0.26
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 2
+  m_Intensity: 20
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -384,8 +438,8 @@ MonoBehaviour:
     m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
-  m_PointLightInnerRadius: 2.0018613
-  m_PointLightOuterRadius: 4.3604503
+  m_PointLightInnerRadius: 6
+  m_PointLightOuterRadius: 50
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
@@ -405,17 +459,256 @@ Transform:
   m_GameObject: {fileID: 619394800}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1, y: 55, z: 0}
+  m_LocalPosition: {x: 64.9, y: 113.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &674533048 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8520430306771600481, guid: c8c6936349392df4487254da8a12b882, type: 3}
+  m_PrefabInstance: {fileID: 7575657011286344350}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &674533052 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8363336753607351105, guid: c8c6936349392df4487254da8a12b882, type: 3}
+  m_PrefabInstance: {fileID: 7575657011286344350}
+  m_PrefabAsset: {fileID: 0}
+--- !u!70 &674533054
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674533048}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.00000023841858, y: -0.000000014901161}
+  m_Size: {x: 0.3, y: 0.8}
+  m_Direction: 0
+--- !u!114 &674533055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674533048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5daf415e07ed3439ede6c45570dd2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackDamage: 1
+  attackCooldown: 1
+  attackRange: 1.5
+  zombieType: Brightness
+  lightDecreaseAmount: 1
+  explosionRadius: 5
+  veryNearRadius: 1.5
+  midNearRadius: 3
+  farRadius: 5
+  veryNearDamage: 5
+  midNearDamage: 3
+  farDamage: 1
+  lastAttackTime: 0
+  playerInRange: 0
+--- !u!114 &674533056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674533048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b612742e492a68e46809e7a7d90342ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 10
+  currentHealth: 0
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealthPercentChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealing:
+    m_PersistentCalls:
+      m_Calls: []
+  isDead: 0
+  isInvulnerable: 0
+  invulnerabilityDuration: 0
+--- !u!114 &674533057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674533048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8e80d911ebdb544a637d6c3afc54dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 674533052}
+  zombieType: Brightness
+  deathAnimationDuration: 2
+  deathEffect: {fileID: 0}
+  deathSound: {fileID: 0}
 --- !u!4 &874315590 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1129829285545317134, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
   m_PrefabInstance: {fileID: 1350473396575304455}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &874315594 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8955623166303986742, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
+  m_PrefabInstance: {fileID: 1350473396575304455}
+  m_PrefabAsset: {fileID: 0}
+--- !u!70 &874315596
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497958239}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.00000023841858, y: 0}
+  m_Size: {x: 0.3, y: 0.8}
+  m_Direction: 0
+--- !u!114 &874315597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497958239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5daf415e07ed3439ede6c45570dd2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackDamage: 1
+  attackCooldown: 1
+  attackRange: 1.5
+  zombieType: Normal
+  lightDecreaseAmount: 1
+  explosionRadius: 5
+  veryNearRadius: 1.5
+  midNearRadius: 3
+  farRadius: 5
+  veryNearDamage: 5
+  midNearDamage: 3
+  farDamage: 1
+  lastAttackTime: 0
+  playerInRange: 0
+--- !u!114 &874315598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497958239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b612742e492a68e46809e7a7d90342ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 10
+  currentHealth: 0
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealthPercentChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealing:
+    m_PersistentCalls:
+      m_Calls: []
+  isDead: 0
+  isInvulnerable: 0
+  invulnerabilityDuration: 0
+--- !u!114 &874315599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497958239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8e80d911ebdb544a637d6c3afc54dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 874315594}
+  zombieType: Normal
+  deathAnimationDuration: 2
+  deathEffect: {fileID: 0}
+  deathSound: {fileID: 0}
 --- !u!1 &935892142
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,6 +793,128 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &955476435 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1612104103918616150, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
+  m_PrefabInstance: {fileID: 493169608471171552}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &955476439 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 2699712241497601634, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
+  m_PrefabInstance: {fileID: 493169608471171552}
+  m_PrefabAsset: {fileID: 0}
+--- !u!70 &955476441
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955476435}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.000000029802322, y: -0.000000014901161}
+  m_Size: {x: 0.3, y: 0.6}
+  m_Direction: 0
+--- !u!114 &955476442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955476435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5daf415e07ed3439ede6c45570dd2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackDamage: 1
+  attackCooldown: 1
+  attackRange: 1.5
+  zombieType: Dynamite
+  lightDecreaseAmount: 1
+  explosionRadius: 5
+  veryNearRadius: 1.5
+  midNearRadius: 3
+  farRadius: 5
+  veryNearDamage: 5
+  midNearDamage: 3
+  farDamage: 1
+  lastAttackTime: 0
+  playerInRange: 0
+--- !u!114 &955476443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955476435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b612742e492a68e46809e7a7d90342ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 10
+  currentHealth: 0
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealthPercentChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealing:
+    m_PersistentCalls:
+      m_Calls: []
+  isDead: 0
+  isInvulnerable: 0
+  invulnerabilityDuration: 0
+--- !u!114 &955476444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955476435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8e80d911ebdb544a637d6c3afc54dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 955476439}
+  zombieType: Dynamite
+  deathAnimationDuration: 2
+  deathEffect: {fileID: 0}
+  deathSound: {fileID: 0}
 --- !u!1 &964915463
 GameObject:
   m_ObjectHideFlags: 0
@@ -515,6 +930,8 @@ GameObject:
   - component: {fileID: 964915468}
   - component: {fileID: 964915469}
   - component: {fileID: 964915470}
+  - component: {fileID: 964915471}
+  - component: {fileID: 964915472}
   m_Layer: 8
   m_Name: MainCharacter
   m_TagString: Player
@@ -608,7 +1025,7 @@ Transform:
   m_GameObject: {fileID: 964915463}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.16, y: 1.5, z: 0}
+  m_LocalPosition: {x: -9.33, y: 1.5, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -656,9 +1073,9 @@ MonoBehaviour:
   m_ComponentVersion: 2
   m_LightType: 3
   m_BlendStyleIndex: 0
-  m_FalloffIntensity: 0.37
+  m_FalloffIntensity: 0.353
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 3.55
+  m_Intensity: 3
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -681,7 +1098,7 @@ MonoBehaviour:
     m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
-  m_PointLightInnerRadius: 5
+  m_PointLightInnerRadius: 2.5
   m_PointLightOuterRadius: 8
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
@@ -712,19 +1129,32 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   collisionRadius: 0.2
+  firePoint: {fileID: 0}
+  bulletPrefab: {fileID: 0}
+  bulletSpeed: 10
+  fireRate: 0.1
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
   maxClips: 5
   bulletsPerClip: 10
   totalBullets: 50
+  playerLight: {fileID: 0}
+  initialLightIntensity: 3
+  lightDecreaseAmount: 1
+  invulnerabilityDuration: 1
   currentClip: 1
   bulletsInCurrentClip: 10
   clipAmmo: 0000000000000000000000000000000000000000
   previousClip: 1
   isReloading: 0
   isAttacking: 0
+  isShooting: 0
   isMoving: 0
   isRunning: 0
   lastMovementInput: {x: 0, y: 0}
   isInputBlocked: 0
+  lastShotTime: 0
 --- !u!114 &964915470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -755,6 +1185,117 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &964915471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 964915463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b612742e492a68e46809e7a7d90342ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 20
+  currentHealth: 0
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealthPercentChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealing:
+    m_PersistentCalls:
+      m_Calls: []
+  isDead: 0
+  isInvulnerable: 0
+  invulnerabilityDuration: 0
+--- !u!114 &964915472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 964915463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4795f64c77776c94c8089940c2864260, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar: {fileID: 0}
+  healthText: {fileID: 0}
+  healthBarFill: {fileID: 0}
+  healthPanel: {fileID: 0}
+  fullHealthColor: {r: 0, g: 1, b: 0, a: 1}
+  midHealthColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  lowHealthColor: {r: 1, g: 0, b: 0, a: 1}
+  criticalHealthColor: {r: 1, g: 0.2, b: 0.2, a: 1}
+  animateHealthBar: 1
+  animationSpeed: 5
+--- !u!1 &1127643649
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1127643651}
+  - component: {fileID: 1127643650}
+  m_Layer: 0
+  m_Name: AmmoUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1127643650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127643649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c44eb25c417d024d913f82c99abff58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoText: {fileID: 0}
+  clipText: {fileID: 0}
+  totalAmmoText: {fileID: 0}
+  ammoBar: {fileID: 0}
+  clipIndicators:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  fullClipColor: {r: 0, g: 1, b: 0, a: 1}
+  partialClipColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  emptyClipColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!4 &1127643651
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127643649}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 248.92581, y: 438.502, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1155402970
 GameObject:
   m_ObjectHideFlags: 0
@@ -900,7 +1441,7 @@ Transform:
   m_GameObject: {fileID: 1704662296}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.62, y: 0.6, z: 0}
+  m_LocalPosition: {x: -14.4, y: -3.33, z: 0}
   m_LocalScale: {x: 3.5, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -972,7 +1513,7 @@ GameObject:
   - component: {fileID: 1739839419}
   - component: {fileID: 1739839418}
   m_Layer: 0
-  m_Name: Global Light 2D (1)
+  m_Name: ' Global Light 2D'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -995,7 +1536,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.08
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -4587,10 +5128,10 @@ MonoBehaviour:
   normalZombiePrefab: {fileID: 1722859942990277956, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
   brightnessZombiePrefab: {fileID: 8520430306771600481, guid: c8c6936349392df4487254da8a12b882, type: 3}
   dynamiteZombiePrefab: {fileID: 1612104103918616150, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
-  normalZombieChance: 60
-  brightnessZombieChance: 25
-  dynamiteZombieChance: 15
-  spawnRate: 2
+  normalZombieChance: 55
+  brightnessZombieChance: 35
+  dynamiteZombieChance: 10
+  spawnRate: 6
   spawnAreaSize: {x: 20, y: 15}
   obstacleLayerMask:
     serializedVersion: 2
@@ -4612,8 +5153,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 325372388}
     m_Modifications:
     - target: {fileID: 1612104103918616150, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+    - target: {fileID: 1612104103918616150, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
       propertyPath: m_Name
       value: Dynamite_Zombie
+      objectReference: {fileID: 0}
+    - target: {fileID: 6843571367920943830, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6999689676295096121, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4658,7 +5207,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1612104103918616150, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 955476442}
+    - targetCorrespondingSourceObject: {fileID: 1612104103918616150, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 955476441}
+    - targetCorrespondingSourceObject: {fileID: 1612104103918616150, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 955476443}
+    - targetCorrespondingSourceObject: {fileID: 1612104103918616150, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 955476444}
   m_SourcePrefab: {fileID: 100100000, guid: 052c9d2a66e7fb04d9483b4e4a3f434f, type: 3}
 --- !u!1001 &1350473396575304455
 PrefabInstance:
@@ -4735,7 +5296,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1722859942990277956, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 874315597}
+    - targetCorrespondingSourceObject: {fileID: 1722859942990277956, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 874315596}
+    - targetCorrespondingSourceObject: {fileID: 1722859942990277956, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 874315598}
+    - targetCorrespondingSourceObject: {fileID: 1722859942990277956, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 874315599}
   m_SourcePrefab: {fileID: 100100000, guid: 89209ba6e0be05d4994c5cc1d1b48193, type: 3}
 --- !u!1001 &7575657011286344350
 PrefabInstance:
@@ -4786,13 +5359,29 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8520430306771600481, guid: c8c6936349392df4487254da8a12b882, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
+    - target: {fileID: 8520430306771600481, guid: c8c6936349392df4487254da8a12b882, type: 3}
       propertyPath: m_Name
       value: Brightness_Zombie
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8520430306771600481, guid: c8c6936349392df4487254da8a12b882, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 674533055}
+    - targetCorrespondingSourceObject: {fileID: 8520430306771600481, guid: c8c6936349392df4487254da8a12b882, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 674533054}
+    - targetCorrespondingSourceObject: {fileID: 8520430306771600481, guid: c8c6936349392df4487254da8a12b882, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 674533056}
+    - targetCorrespondingSourceObject: {fileID: 8520430306771600481, guid: c8c6936349392df4487254da8a12b882, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 674533057}
   m_SourcePrefab: {fileID: 100100000, guid: c8c6936349392df4487254da8a12b882, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -4808,3 +5397,5 @@ SceneRoots:
   - {fileID: 325372388}
   - {fileID: 2032051037}
   - {fileID: 935892144}
+  - {fileID: 1127643651}
+  - {fileID: 464286572}

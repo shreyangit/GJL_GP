@@ -169,24 +169,38 @@ public class MultiZombieSpawner : MonoBehaviour
 
     void SetupZombieAI(GameObject zombie, ZombieType type)
     {
+        // Alternative approach: Let the AI components find the player themselves
+        // since they already have fallback logic to find the player
+
         switch (type)
         {
             case ZombieType.Normal:
                 ZombieAI normalAI = zombie.GetComponent<ZombieAI>();
-                if (normalAI != null) normalAI.player = player;
+                if (normalAI != null)
+                {
+                    // If using Fix 1-3, this will work:
+                    normalAI.player = FindFirstObjectByType<PlayerController>();
+                }
                 break;
 
             case ZombieType.Brightness:
                 BrightnessZombieAI brightnessAI = zombie.GetComponent<BrightnessZombieAI>();
-                if (brightnessAI != null) brightnessAI.player = player;
+                if (brightnessAI != null)
+                {
+                    brightnessAI.player = FindFirstObjectByType<PlayerController>();
+                }
                 break;
 
             case ZombieType.Dynamite:
                 DynamiteZombieAI dynamiteAI = zombie.GetComponent<DynamiteZombieAI>();
-                if (dynamiteAI != null) dynamiteAI.player = player;
+                if (dynamiteAI != null)
+                {
+                    dynamiteAI.player = FindFirstObjectByType<PlayerController>();
+                }
                 break;
         }
     }
+
 
     Vector3 FindValidSpawnPosition()
     {

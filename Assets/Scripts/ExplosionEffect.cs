@@ -3,117 +3,94 @@ using UnityEngine;
 public class ExplosionEffect : MonoBehaviour
 {
     [Header("Explosion Settings")]
-    public float explosionDuration = 1f;
-    public float explosionRadius = 3f;
-    public float explosionDamage = 50f;
-
-    [Header("Sprite Animation")]
     public Sprite[] explosionSprites;
-    public float frameRate = 12f;
+    public float explosionRadius = 5f;
+    public float explosionDamage = 50f;
+    public float animationSpeed = 10f;
+    public float effectDuration = 1f;
 
     private SpriteRenderer spriteRenderer;
-    private int currentFrame = 0;
-    private float frameTimer = 0f;
-    private float explosionTimer = 0f;
-    private bool hasExploded = false;
+    private int currentSpriteIndex = 0;
+    private float timer = 0f;
+    private float spriteTimer = 0f;
+    private bool hasDealtDamage = false;
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        // If no sprites assigned, try to load them from the explosion folder
-        if (explosionSprites == null || explosionSprites.Length == 0)
+        // Deal explosion damage immediately
+        if (!hasDealtDamage)
         {
-            LoadExplosionSprites();
+            DealExplosionDamage();
+            hasDealtDamage = true;
         }
 
-        // Start explosion animation
-        if (explosionSprites.Length > 0)
+        // Start animation
+        if (explosionSprites != null && explosionSprites.Length > 0)
         {
             spriteRenderer.sprite = explosionSprites[0];
         }
+
+        // Destroy after duration
+        Destroy(gameObject, effectDuration);
     }
 
     void Update()
     {
-        explosionTimer += Time.deltaTime;
+        timer += Time.deltaTime;
+        spriteTimer += Time.deltaTime;
 
         // Animate explosion sprites
-        AnimateExplosion();
-
-        // Check if explosion is complete
-        if (explosionTimer >= explosionDuration)
+        if (explosionSprites != null && explosionSprites.Length > 0)
         {
-            Destroy(gameObject);
-        }
-    }
-
-    void AnimateExplosion()
-    {
-        if (explosionSprites.Length == 0) return;
-
-        frameTimer += Time.deltaTime;
-
-        if (frameTimer >= 1f / frameRate)
-        {
-            frameTimer = 0f;
-            currentFrame++;
-
-            if (currentFrame < explosionSprites.Length)
+            if (spriteTimer >= 1f / animationSpeed)
             {
-                spriteRenderer.sprite = explosionSprites[currentFrame];
-            }
-            else
-            {
-                // Animation complete, trigger explosion damage if not done
-                if (!hasExploded)
-                {
-                    TriggerExplosionDamage();
-                    hasExploded = true;
-                }
+                currentSpriteIndex = (currentSpriteIndex + 1) % explosionSprites.Length;
+                spriteRenderer.sprite = explosionSprites[currentSpriteIndex];
+                spriteTimer = 0f;
             }
         }
     }
 
-    void LoadExplosionSprites()
+    void DealExplosionDamage()
     {
-        // Try to load explosion sprites from Resources or manually assign them
-        Sprite[] loadedSprites = Resources.LoadAll<Sprite>("Effects/Explosion_Dynamite");
-        if (loadedSprites.Length > 0)
+        // Find player
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        PlayerController playerController = player.GetComponent<PlayerController>();
+        if (playerController == null) return;
+
+        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+        int damage = 0;
+        string range = "";
+
+        // Determine damage based on distance (same logic as ZombieAttack)
+        if (distanceToPlayer <= 1.5f)
         {
-            explosionSprites = loadedSprites;
-            Debug.Log($"Loaded {explosionSprites.Length} explosion sprites");
+            damage = 5;
+            range = "Very Near";
+        }
+        else if (distanceToPlayer <= 3f)
+        {
+            damage = 3;
+            range = "Mid Near";
+        }
+        else if (distanceToPlayer <= 5f)
+        {
+            damage = 1;
+            range = "Far";
+        }
+
+        if (damage > 0)
+        {
+            playerController.TakeDamage(damage, $"Dynamite Explosion ({range})");
+            Debug.Log($"Explosion dealt {damage} damage to player at {range} range (distance: {distanceToPlayer:F1})");
         }
         else
         {
-            Debug.LogWarning("Could not load explosion sprites. Please assign them manually.");
+            Debug.Log($"Player out of explosion range (distance: {distanceToPlayer:F1})");
         }
-    }
-
-    void TriggerExplosionDamage()
-    {
-        Debug.Log($"Explosion damage triggered at {transform.position} with radius {explosionRadius}");
-
-        // Here you would implement damage to player/other objects
-        // For now, just log the explosion
-
-        // Find all colliders in explosion radius
-        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
-
-        foreach (Collider2D hit in hitColliders)
-        {
-            if (hit.CompareTag("Player"))
-            {
-                Debug.Log($"Player caught in explosion! Damage: {explosionDamage}");
-                // Apply damage to player here
-            }
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        // Draw explosion radius
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
 }

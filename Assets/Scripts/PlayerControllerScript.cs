@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,10 +13,23 @@ public class PlayerController : MonoBehaviour
     public LayerMask obstacleLayerMask = 64; // Walls layer
     public float collisionRadius = 0.5f;
 
+    [Header("Shooting Settings")]
+    public Transform firePoint; // Where bullets spawn from
+    public GameObject bulletPrefab; // Bullet prefab to spawn
+    public float bulletSpeed = 10f;
+    public float fireRate = 0.1f; // Time between shots
+    public LayerMask enemyLayerMask = 128; // Zombies layer
+
     [Header("Ammo System")]
     public int maxClips = 5;
     public int bulletsPerClip = 10;
     public int totalBullets = 50;
+
+    [Header("Health & Light System")]
+    public Light2D playerLight; // Reference to player's Light2D
+    public float initialLightIntensity = 3f;
+    public float lightDecreaseAmount = 1f;
+    public float invulnerabilityDuration = 1f; // After taking damage
 
     [Header("Current Ammo State (Read Only)")]
     [SerializeField] private int currentClip = 1;
@@ -26,12 +40,14 @@ public class PlayerController : MonoBehaviour
     [Header("Animation States")]
     public bool isReloading = false;
     public bool isAttacking = false;
+    public bool isShooting = false;
     public bool isMoving = false;
     public bool isRunning = false;
 
     [Header("Debug Info")]
     [SerializeField] private Vector2 lastMovementInput;
     [SerializeField] private bool isInputBlocked = false;
+    [SerializeField] private float lastShotTime = 0f;
 
     // Private components and variables
     private Rigidbody2D rb2d;
@@ -40,15 +56,22 @@ public class PlayerController : MonoBehaviour
     private Vector2 movementInput;
     private Vector2 lastFacingDirection = Vector2.down;
 
+    // Health and light system private fields
+    private HealthSystem healthSystem;
+    private float currentLightIntensity;
+
     // Animation state tracking
     private float attackCooldown = 0f;
     private float reloadCooldown = 0f;
+    private float shootCooldown = 0f;
     private const float ATTACK_DURATION = 0.5f;
     private const float RELOAD_DURATION = 1f;
+    private const float SHOOT_DURATION = 0.1f;
 
     // Input System variables
     private PlayerInputActions inputActions;
     private bool runPressed = false;
+    private bool shootPressed = false;
 
     void Awake()
     {
@@ -68,6 +91,13 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Reload.performed += OnReloadInput;
         inputActions.Player.UndoReload.performed += OnUndoReloadInput;
         inputActions.Player.Attack.performed += OnAttackInput;
+
+        // Add shooting input if it exists
+        if (inputActions.Player.Shoot != null)
+        {
+            inputActions.Player.Shoot.performed += OnShootInput;
+            inputActions.Player.Shoot.canceled += OnShootInput;
+        }
     }
 
     void OnDisable()
@@ -82,6 +112,12 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Reload.performed -= OnReloadInput;
         inputActions.Player.UndoReload.performed -= OnUndoReloadInput;
         inputActions.Player.Attack.performed -= OnAttackInput;
+
+        if (inputActions.Player.Shoot != null)
+        {
+            inputActions.Player.Shoot.performed -= OnShootInput;
+            inputActions.Player.Shoot.canceled -= OnShootInput;
+        }
     }
 
     void Start()
@@ -90,6 +126,15 @@ public class PlayerController : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Create firePoint if not assigned
+        if (firePoint == null)
+        {
+            GameObject firePointObj = new GameObject("FirePoint");
+            firePointObj.transform.SetParent(transform);
+            firePointObj.transform.localPosition = new Vector3(0f, 0.5f, 0f); // In front of player
+            firePoint = firePointObj.transform;
+        }
 
         // Initialize Rigidbody2D settings
         if (rb2d != null)
@@ -104,12 +149,41 @@ public class PlayerController : MonoBehaviour
         // Set initial speed
         currentSpeed = walkSpeed;
 
+        // Initialize health system
+        healthSystem = GetComponent<HealthSystem>();
+        if (healthSystem == null)
+        {
+            healthSystem = gameObject.AddComponent<HealthSystem>();
+            healthSystem.maxHealth = 20f; // Player starts with 20 HP
+        }
+
+        // Subscribe to health events
+        healthSystem.OnDeath.AddListener(OnPlayerDeath);
+
+        // Initialize light system
+        if (playerLight == null)
+        {
+            playerLight = GetComponentInChildren<Light2D>();
+        }
+
+        if (playerLight != null)
+        {
+            currentLightIntensity = initialLightIntensity;
+            playerLight.intensity = currentLightIntensity;
+            Debug.Log($"Player light initialized with intensity: {currentLightIntensity}");
+        }
+        else
+        {
+            Debug.LogWarning("No Light2D found on player! Please add a Light2D component.");
+        }
+
         Debug.Log($"Player initialized. Total bullets: {totalBullets}, Current clip: {currentClip}, Bullets in clip: {bulletsInCurrentClip}");
     }
 
     void Update()
     {
         UpdateMovement();
+        UpdateShooting();
         UpdateAnimations();
         UpdateCooldowns();
     }
@@ -117,6 +191,8 @@ public class PlayerController : MonoBehaviour
     // Input System callbacks
     void OnMoveInput(InputAction.CallbackContext context)
     {
+        if (isInputBlocked) return;
+
         movementInput = context.ReadValue<Vector2>();
 
         if (movementInput.magnitude > 0.1f)
@@ -133,6 +209,8 @@ public class PlayerController : MonoBehaviour
 
     void OnRunInput(InputAction.CallbackContext context)
     {
+        if (isInputBlocked) return;
+
         runPressed = context.ReadValueAsButton();
         isRunning = runPressed && isMoving;
         currentSpeed = isRunning ? runSpeed : walkSpeed;
@@ -140,7 +218,10 @@ public class PlayerController : MonoBehaviour
 
     void OnReloadInput(InputAction.CallbackContext context)
     {
-        if (!isReloading && !isAttacking)
+        if (isInputBlocked) return;
+
+        // Allow reloading during movement, just not during other reload
+        if (!isReloading)
         {
             ReloadToNextClip();
         }
@@ -148,7 +229,10 @@ public class PlayerController : MonoBehaviour
 
     void OnUndoReloadInput(InputAction.CallbackContext context)
     {
-        if (!isReloading && !isAttacking)
+        if (isInputBlocked) return;
+
+        // Allow undo reload during movement
+        if (!isReloading)
         {
             ReloadToPreviousClip();
         }
@@ -156,17 +240,27 @@ public class PlayerController : MonoBehaviour
 
     void OnAttackInput(InputAction.CallbackContext context)
     {
-        if (!isReloading && !isAttacking)
+        if (isInputBlocked) return;
+
+        // Allow manual attack during movement! Only prevent during reload
+        if (!isReloading)
         {
             PerformManualAttack();
         }
     }
 
+    void OnShootInput(InputAction.CallbackContext context)
+    {
+        if (isInputBlocked) return;
+
+        shootPressed = context.ReadValueAsButton();
+    }
+
     void UpdateMovement()
     {
-        if (isReloading || isAttacking)
+        // Only stop movement during reload, allow movement during attack and shooting
+        if (isReloading)
         {
-            // Stop movement during animations
             rb2d.linearVelocity = Vector2.zero;
             return;
         }
@@ -196,6 +290,102 @@ public class PlayerController : MonoBehaviour
             rb2d.linearVelocity = Vector2.zero;
             isRunning = false;
         }
+    }
+
+    void UpdateShooting()
+    {
+        // Handle continuous shooting while button is held
+        if (shootPressed && CanShoot() && Time.time >= lastShotTime + fireRate)
+        {
+            Shoot();
+            lastShotTime = Time.time;
+        }
+    }
+
+    void Shoot()
+    {
+        if (!CanShoot()) return;
+
+        // Consume bullet
+        ConsumeBullet();
+
+        // Set shooting state for animation
+        isShooting = true;
+        shootCooldown = SHOOT_DURATION;
+
+        // Create bullet
+        if (bulletPrefab != null)
+        {
+            CreateBullet();
+        }
+        else
+        {
+            // Fallback: create simple bullet
+            CreateSimpleBullet();
+        }
+
+        Debug.Log($"Shot fired! Bullets remaining: {bulletsInCurrentClip}");
+    }
+
+    void CreateBullet()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+
+        // Add Bullet script if it doesn't have one
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        if (bulletScript == null)
+        {
+            bulletScript = bullet.AddComponent<Bullet>();
+        }
+
+        // Set bullet properties
+        bulletScript.Initialize(lastFacingDirection, bulletSpeed, enemyLayerMask);
+    }
+
+    void CreateSimpleBullet()
+    {
+        // Create a simple bullet GameObject
+        GameObject bullet = new GameObject("Bullet");
+        bullet.transform.position = firePoint.position;
+
+        // Add visual (yellow circle)
+        SpriteRenderer bulletRenderer = bullet.AddComponent<SpriteRenderer>();
+        bulletRenderer.sprite = CreateCircleSprite();
+        bulletRenderer.color = Color.yellow;
+        bullet.transform.localScale = Vector3.one * 0.2f;
+
+        // Add physics
+        Rigidbody2D bulletRb = bullet.AddComponent<Rigidbody2D>();
+        bulletRb.gravityScale = 0f;
+        bulletRb.linearVelocity = lastFacingDirection * bulletSpeed;
+
+        // Add collider
+        CircleCollider2D bulletCollider = bullet.AddComponent<CircleCollider2D>();
+        bulletCollider.isTrigger = true;
+
+        // Add bullet script
+        Bullet bulletScript = bullet.AddComponent<Bullet>();
+        bulletScript.Initialize(lastFacingDirection, bulletSpeed, enemyLayerMask);
+    }
+
+    Sprite CreateCircleSprite()
+    {
+        // Create a simple circle texture for bullet
+        Texture2D texture = new Texture2D(32, 32);
+        Color[] colors = new Color[32 * 32];
+
+        for (int i = 0; i < colors.Length; i++)
+        {
+            int x = i % 32;
+            int y = i / 32;
+            float distance = Vector2.Distance(new Vector2(x, y), new Vector2(16, 16));
+            colors[i] = distance <= 16 ? Color.white : Color.clear;
+        }
+
+        texture.SetPixels(colors);
+        texture.Apply();
+
+        return Sprite.Create(texture, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
     }
 
     Vector2 GetCollisionAvoidedMovement(Vector2 intendedMovement)
@@ -237,11 +427,12 @@ public class PlayerController : MonoBehaviour
     {
         if (animator == null) return;
 
-        // Set animation parameters
-        animator.SetBool("IsMoving", isMoving && !isReloading && !isAttacking);
-        animator.SetBool("IsRunning", isRunning && isMoving && !isReloading && !isAttacking);
+        // Set animation parameters - allow running and attacking/shooting simultaneously
+        animator.SetBool("IsMoving", isMoving && !isReloading);
+        animator.SetBool("IsRunning", isRunning && isMoving && !isReloading);
         animator.SetBool("IsReloading", isReloading);
         animator.SetBool("IsAttacking", isAttacking);
+        animator.SetBool("IsShooting", isShooting);
 
         // Set movement direction for directional animations if needed
         animator.SetFloat("MoveX", lastFacingDirection.x);
@@ -267,6 +458,16 @@ public class PlayerController : MonoBehaviour
             if (reloadCooldown <= 0)
             {
                 isReloading = false;
+            }
+        }
+
+        // Update shoot cooldown
+        if (shootCooldown > 0)
+        {
+            shootCooldown -= Time.deltaTime;
+            if (shootCooldown <= 0)
+            {
+                isShooting = false;
             }
         }
     }
@@ -328,13 +529,69 @@ public class PlayerController : MonoBehaviour
 
     void PerformManualAttack()
     {
-        if (isAttacking || isReloading) return;
+        if (isAttacking) return; // Only prevent if already attacking
 
         // Start attack animation
         isAttacking = true;
         attackCooldown = ATTACK_DURATION;
 
         Debug.Log($"Manual attack performed! Facing direction: {lastFacingDirection}");
+    }
+
+    // Health system methods
+    public void TakeDamage(float damage, string source = "Unknown")
+    {
+        if (healthSystem != null)
+        {
+            bool damaged = healthSystem.TakeDamage(damage, source);
+            if (damaged)
+            {
+                // Add invulnerability after taking damage
+                healthSystem.SetInvulnerable(invulnerabilityDuration);
+
+                Debug.Log($"Player took {damage} damage from {source}");
+            }
+        }
+    }
+
+    public void DecreaseLightIntensity(float decreaseAmount = 1f)
+    {
+        if (playerLight == null) return;
+
+        currentLightIntensity -= decreaseAmount;
+        currentLightIntensity = Mathf.Max(0f, currentLightIntensity); // Don't go below 0
+
+        playerLight.intensity = currentLightIntensity;
+
+        Debug.Log($"Player light intensity decreased by {decreaseAmount}. Current intensity: {currentLightIntensity}");
+    }
+
+    public void IncreaseLightIntensity(float increaseAmount = 1f)
+    {
+        if (playerLight == null) return;
+
+        currentLightIntensity += increaseAmount;
+        currentLightIntensity = Mathf.Min(initialLightIntensity, currentLightIntensity); // Don't exceed initial
+
+        playerLight.intensity = currentLightIntensity;
+
+        Debug.Log($"Player light intensity increased by {increaseAmount}. Current intensity: {currentLightIntensity}");
+    }
+
+    private void OnPlayerDeath()
+    {
+        Debug.Log("Player has died! Game Over!");
+
+        // Stop all input
+        isInputBlocked = true;
+
+        // Stop movement
+        if (rb2d != null)
+            rb2d.linearVelocity = Vector2.zero;
+
+        // You can add game over logic here
+        // Example: Time.timeScale = 0f; // Pause game
+        // Example: Load game over scene
     }
 
     // Public methods for other scripts to access ammo info
@@ -360,7 +617,7 @@ public class PlayerController : MonoBehaviour
 
     public bool CanShoot()
     {
-        return bulletsInCurrentClip > 0 && !isReloading && !isAttacking;
+        return bulletsInCurrentClip > 0 && !isReloading;
     }
 
     public void ConsumeBullet()
@@ -373,11 +630,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Add this property for easy access
+    public HealthSystem Health => healthSystem;
+
     void OnDrawGizmosSelected()
     {
         // Draw collision radius
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, collisionRadius);
+
+        // Draw fire point
+        if (firePoint != null)
+        {
+            Gizmos.color = Color.orange;
+            Gizmos.DrawWireSphere(firePoint.position, 0.2f);
+        }
 
         // Draw movement direction
         if (lastMovementInput.magnitude > 0.1f)
