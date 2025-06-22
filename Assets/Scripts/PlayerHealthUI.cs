@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -89,92 +89,82 @@ public class PlayerHealthUI : MonoBehaviour
             canvasObj.AddComponent<GraphicRaycaster>();
         }
 
-        // Create health panel in bottom-right
+        // Create Health Panel
         healthPanel = new GameObject("HealthPanel");
         healthPanel.transform.SetParent(canvas.transform, false);
 
         RectTransform panelRect = healthPanel.AddComponent<RectTransform>();
-        panelRect.anchorMin = new Vector2(1f, 0f); // Bottom-right anchor
-        panelRect.anchorMax = new Vector2(1f, 0f);
-        panelRect.pivot = new Vector2(1f, 0f);
-        panelRect.anchoredPosition = new Vector2(-20f, 20f); // 20px from edges
-        panelRect.sizeDelta = new Vector2(200f, 80f);
+        panelRect.anchorMin = new Vector2(0f, 0f); // Bottom-left
+        panelRect.anchorMax = new Vector2(0f, 0f);
+        panelRect.pivot = new Vector2(0f, 0f);
+        panelRect.anchoredPosition = new Vector2(20f, 20f); // Padding from edge
+        panelRect.sizeDelta = new Vector2(250f, 60f);
 
-        // Add background
+        // Background (optional for future use)
         Image panelBg = healthPanel.AddComponent<Image>();
-        panelBg.color = new Color(0f, 0f, 0f, 0.8f); // Semi-transparent black
+        panelBg.color = new Color(0f, 0f, 0f, 0.5f); // Semi-transparent black
 
-        // Create health text
+        // Add Health Text
         GameObject healthTextObj = new GameObject("HealthText");
         healthTextObj.transform.SetParent(healthPanel.transform, false);
-
         healthText = healthTextObj.AddComponent<TextMeshProUGUI>();
-        healthText.text = "Health: 20/20";
-        healthText.fontSize = 16;
+        healthText.text = "Health: 20 / 20";
+        healthText.fontSize = 20;
         healthText.color = Color.white;
         healthText.alignment = TextAlignmentOptions.Center;
 
         RectTransform healthTextRect = healthText.GetComponent<RectTransform>();
-        healthTextRect.anchorMin = Vector2.zero;
-        healthTextRect.anchorMax = Vector2.one;
-        healthTextRect.offsetMin = new Vector2(10f, 45f);
-        healthTextRect.offsetMax = new Vector2(-10f, -5f);
+        healthTextRect.anchorMin = new Vector2(0f, 0.5f);
+        healthTextRect.anchorMax = new Vector2(1f, 1f);
+        healthTextRect.offsetMin = new Vector2(0f, 5f);
+        healthTextRect.offsetMax = new Vector2(0f, -5f);
 
-        // Create health bar background
-        GameObject healthBarBg = new GameObject("HealthBarBackground");
-        healthBarBg.transform.SetParent(healthPanel.transform, false);
-
-        Image barBg = healthBarBg.AddComponent<Image>();
-        barBg.color = new Color(0.2f, 0.2f, 0.2f, 1f); // Dark gray
-
-        RectTransform barBgRect = healthBarBg.GetComponent<RectTransform>();
-        barBgRect.anchorMin = Vector2.zero;
-        barBgRect.anchorMax = Vector2.one;
-        barBgRect.offsetMin = new Vector2(15f, 15f);
-        barBgRect.offsetMax = new Vector2(-15f, 45f);
-
-        // Create health bar slider
+        // Create Health Bar
         GameObject healthBarObj = new GameObject("HealthBar");
-        healthBarObj.transform.SetParent(healthBarBg.transform, false);
-
+        healthBarObj.transform.SetParent(healthPanel.transform, false);
         healthBar = healthBarObj.AddComponent<Slider>();
         healthBar.minValue = 0f;
         healthBar.maxValue = 1f;
         healthBar.value = 1f;
+        healthBar.transition = Selectable.Transition.None;
+        healthBar.direction = Slider.Direction.LeftToRight;
 
-        RectTransform sliderRect = healthBar.GetComponent<RectTransform>();
-        sliderRect.anchorMin = Vector2.zero;
-        sliderRect.anchorMax = Vector2.one;
-        sliderRect.offsetMin = Vector2.zero;
-        sliderRect.offsetMax = Vector2.zero;
+        RectTransform barRect = healthBar.GetComponent<RectTransform>();
+        barRect.anchorMin = new Vector2(0f, 0f);
+        barRect.anchorMax = new Vector2(1f, 0.5f);
+        barRect.offsetMin = new Vector2(10f, 5f);
+        barRect.offsetMax = new Vector2(-10f, -5f);
 
-        // Create health bar fill
-        GameObject fillArea = new GameObject("FillArea");
-        fillArea.transform.SetParent(healthBarObj.transform, false);
+        // Background bar
+        GameObject backgroundObj = new GameObject("Background");
+        backgroundObj.transform.SetParent(healthBarObj.transform, false);
+        Image bgImage = backgroundObj.AddComponent<Image>();
+        bgImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
 
-        RectTransform fillAreaRect = fillArea.AddComponent<RectTransform>();
-        fillAreaRect.anchorMin = Vector2.zero;
-        fillAreaRect.anchorMax = Vector2.one;
-        fillAreaRect.offsetMin = Vector2.zero;
-        fillAreaRect.offsetMax = Vector2.zero;
+        RectTransform bgRect = bgImage.GetComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero;
+        bgRect.anchorMax = Vector2.one;
+        bgRect.offsetMin = Vector2.zero;
+        bgRect.offsetMax = Vector2.zero;
+        healthBar.targetGraphic = bgImage;
 
-        GameObject fill = new GameObject("Fill");
-        fill.transform.SetParent(fillArea.transform, false);
-
-        healthBarFill = fill.AddComponent<Image>();
+        // Fill area
+        GameObject fillObj = new GameObject("Fill");
+        fillObj.transform.SetParent(healthBarObj.transform, false);
+        healthBarFill = fillObj.AddComponent<Image>();
         healthBarFill.color = fullHealthColor;
         healthBarFill.type = Image.Type.Filled;
+        healthBarFill.fillMethod = Image.FillMethod.Horizontal;
 
-        RectTransform fillRect = fill.GetComponent<RectTransform>();
+        RectTransform fillRect = healthBarFill.GetComponent<RectTransform>();
         fillRect.anchorMin = Vector2.zero;
         fillRect.anchorMax = Vector2.one;
         fillRect.offsetMin = Vector2.zero;
         fillRect.offsetMax = Vector2.zero;
 
-        // Connect slider to fill
         healthBar.fillRect = fillRect;
 
-        Debug.Log("Player Health UI created successfully!");
+        Debug.Log("✅ Clean Health UI created!");
     }
 
     public void UpdateHealthBar(float healthPercentage)

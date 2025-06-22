@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ZombieAttack : MonoBehaviour
 {
@@ -20,13 +20,18 @@ public class ZombieAttack : MonoBehaviour
     public int midNearDamage = 3;
     public int farDamage = 1;
 
+    [Header("Collision Detection")]
+    public LayerMask playerLayerMask = 128; // ✅ Player layer 7 (2^7 = 128)
+    public bool useExistingCollider = true; // ✅ Use existing collider instead of creating new one
+
     [Header("Debug Info")]
     [SerializeField] private float lastAttackTime = 0f;
     [SerializeField] private bool playerInRange = false;
+    [SerializeField] private float currentDistanceToPlayer = 0f;
 
     private Transform player;
     private PlayerController playerController;
-    private CircleCollider2D attackCollider;
+    private Collider2D attackCollider;
 
     void Start()
     {
@@ -36,41 +41,140 @@ public class ZombieAttack : MonoBehaviour
         {
             player = playerObj.transform;
             playerController = playerObj.GetComponent<PlayerController>();
+            Debug.Log($"✅ {gameObject.name} found player: {playerObj.name}");
+        }
+        else
+        {
+            Debug.LogError($"❌ {gameObject.name} could not find player with 'Player' tag!");
+            return;
         }
 
-        // Create attack range collider
-        attackCollider = gameObject.AddComponent<CircleCollider2D>();
-        attackCollider.radius = attackRange;
-        attackCollider.isTrigger = true;
+        // ✅ Setup attack collider - use existing or create new
+        SetupAttackCollider();
 
-        Debug.Log($"{gameObject.name} ({zombieType} zombie) attack system initialized");
+        Debug.Log($"✅ {gameObject.name} ({zombieType} zombie) attack system initialized");
+    }
+
+    void SetupAttackCollider()
+    {
+        if (useExistingCollider)
+        {
+            // ✅ Use existing collider and modify it for attack detection
+            attackCollider = GetComponent<Collider2D>();
+
+            if (attackCollider != null)
+            {
+                attackCollider.isTrigger = true;
+
+                // ✅ Adjust size based on collider type
+                if (attackCollider is CapsuleCollider2D capsule)
+                {
+                    capsule.size = new Vector2(attackRange * 2f, attackRange * 2f);
+                }
+                else if (attackCollider is CircleCollider2D circle)
+                {
+                    circle.radius = attackRange;
+                }
+
+                Debug.Log($"✅ Using existing {attackCollider.GetType().Name} for attack detection");
+            }
+            else
+            {
+                CreateNewAttackCollider();
+            }
+        }
+        else
+        {
+            CreateNewAttackCollider();
+        }
+    }
+
+    void CreateNewAttackCollider()
+    {
+        // ✅ Create new attack collider
+        GameObject attackTrigger = new GameObject("AttackTrigger");
+        attackTrigger.transform.SetParent(transform);
+        attackTrigger.transform.localPosition = Vector3.zero;
+
+        CircleCollider2D newCollider = attackTrigger.AddComponent<CircleCollider2D>();
+        newCollider.radius = attackRange;
+        newCollider.isTrigger = true;
+
+        // ✅ Add this script to the trigger object
+        ZombieAttackTrigger trigger = attackTrigger.AddComponent<ZombieAttackTrigger>();
+        trigger.parentAttack = this;
+
+        attackCollider = newCollider;
+        Debug.Log($"✅ Created new attack trigger for {gameObject.name}");
     }
 
     void Update()
     {
-        // Try to attack if player is in range and cooldown is over
+        // ✅ ENHANCED: Distance-based backup detection
+        if (player != null)
+        {
+            currentDistanceToPlayer = Vector2.Distance(transform.position, player.position);
+
+            // ✅ Backup detection: Check distance even if trigger fails
+            if (currentDistanceToPlayer <= attackRange)
+            {
+                if (!playerInRange)
+                {
+                    Debug.Log($"🔍 {zombieType} zombie backup detection: Player in range ({currentDistanceToPlayer:F2})");
+                    playerInRange = true;
+                }
+            }
+            else if (currentDistanceToPlayer > attackRange * 1.2f) // Add buffer to prevent flickering
+            {
+                if (playerInRange)
+                {
+                    Debug.Log($"🔍 {zombieType} zombie backup detection: Player out of range ({currentDistanceToPlayer:F2})");
+                    playerInRange = false;
+                }
+            }
+        }
+
+        // ✅ Attack logic
         if (playerInRange && Time.time >= lastAttackTime + attackCooldown)
         {
             AttackPlayer();
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    // ✅ Make these public so external trigger can call them
+    public void OnPlayerEnterRange(Collider2D playerCollider)
     {
-        if (other.CompareTag("Player"))
+        if (playerCollider.CompareTag("Player") || IsPlayerLayer(playerCollider.gameObject.layer))
         {
             playerInRange = true;
-            Debug.Log($"{zombieType} zombie detected player in attack range");
+            Debug.Log($"✅ {zombieType} zombie detected player in attack range via trigger");
         }
+    }
+
+    public void OnPlayerExitRange(Collider2D playerCollider)
+    {
+        if (playerCollider.CompareTag("Player") || IsPlayerLayer(playerCollider.gameObject.layer))
+        {
+            playerInRange = false;
+            Debug.Log($"✅ {zombieType} zombie lost player from attack range via trigger");
+        }
+    }
+
+    // ✅ Built-in trigger detection (for when using existing collider)
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        OnPlayerEnterRange(other);
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            playerInRange = false;
-            Debug.Log($"{zombieType} zombie lost player from attack range");
-        }
+        OnPlayerExitRange(other);
+    }
+
+    // ✅ Helper method to check player layer
+    bool IsPlayerLayer(int layer)
+    {
+        return (playerLayerMask.value & (1 << layer)) > 0;
     }
 
     void AttackPlayer()
@@ -99,15 +203,25 @@ public class ZombieAttack : MonoBehaviour
     void AttackNormalZombie()
     {
         playerController.TakeDamage(attackDamage, $"{gameObject.name} (Normal Zombie)");
-        Debug.Log($"Normal zombie {gameObject.name} attacked player for {attackDamage} damage");
+        Debug.Log($"🗡️ Normal zombie {gameObject.name} attacked player for {attackDamage} damage");
     }
 
     void AttackBrightnessZombie()
     {
         // Brightness zombies don't deal HP damage, they decrease light intensity
-        playerController.DecreaseLightIntensity(lightDecreaseAmount);
-        Debug.Log($"Brightness zombie {gameObject.name} decreased player's light intensity by {lightDecreaseAmount}");
+        if (playerController != null)
+        {
+            playerController.DecreaseLightIntensity(lightDecreaseAmount);
+            Debug.Log($"💡 Brightness zombie {gameObject.name} decreased player's light intensity by {lightDecreaseAmount}");
+
+            // ✅ Also show current light intensity
+            if (playerController.playerLight != null)
+            {
+                Debug.Log($"💡 Player light intensity now: {playerController.playerLight.intensity}");
+            }
+        }
     }
+
 
     void AttackDynamiteZombie()
     {
@@ -151,7 +265,7 @@ public class ZombieAttack : MonoBehaviour
             playerController.TakeDamage(explosionDamage, $"{gameObject.name} (Dynamite Explosion - {damageRange})");
         }
 
-        Debug.Log($"Dynamite zombie {gameObject.name} exploded! Distance: {distanceToPlayer:F1}, Range: {damageRange}, Damage: {explosionDamage}");
+        Debug.Log($"💥 Dynamite zombie {gameObject.name} exploded! Distance: {distanceToPlayer:F1}, Range: {damageRange}, Damage: {explosionDamage}");
 
         // Destroy the dynamite zombie after explosion
         Destroy(gameObject);
@@ -162,6 +276,15 @@ public class ZombieAttack : MonoBehaviour
         // Draw attack range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        // Draw current distance to player
+        if (player != null)
+        {
+            Gizmos.color = playerInRange ? Color.green : Color.yellow;
+            Gizmos.DrawLine(transform.position, player.position);
+
+            // Show distance text would be nice, but Gizmos doesn't support text
+        }
 
         // Draw explosion ranges for dynamite zombies
         if (zombieType.ToLower() == "dynamite")

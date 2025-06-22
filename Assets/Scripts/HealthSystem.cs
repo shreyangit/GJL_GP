@@ -1,11 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 public class HealthSystem : MonoBehaviour
 {
     [Header("Health Settings")]
     public float maxHealth = 20f;
-    [SerializeField] private float currentHealth;
+    [SerializeField] public float currentHealth;
 
     [Header("Health Events")]
     public UnityEvent<float> OnHealthChanged; // Passes current health

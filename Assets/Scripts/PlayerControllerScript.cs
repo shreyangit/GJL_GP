@@ -1,6 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.XR; // ✅ Optional: for cross-platform haptics
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,15 +12,15 @@ public class PlayerController : MonoBehaviour
     public float currentSpeed;
 
     [Header("Collision Avoidance")]
-    public LayerMask obstacleLayerMask = 64; // Walls layer
+    public LayerMask obstacleLayerMask = 32; // Walls layer (layer 5)
     public float collisionRadius = 0.5f;
 
     [Header("Shooting Settings")]
     public Transform firePoint; // Where bullets spawn from
-    public GameObject bulletPrefab; // Bullet prefab to spawn
+    public GameObject bulletPrefab; // ✅ Bullet prefab to spawn
     public float bulletSpeed = 10f;
     public float fireRate = 0.1f; // Time between shots
-    public LayerMask enemyLayerMask = 128; // Zombies layer
+    public LayerMask enemyLayerMask = 64; // Zombies layer (layer 6)
 
     [Header("Ammo System")]
     public int maxClips = 5;
@@ -72,6 +74,11 @@ public class PlayerController : MonoBehaviour
     private PlayerInputActions inputActions;
     private bool runPressed = false;
     private bool shootPressed = false;
+
+    [Header("🎵 Animation Audio")]
+    public AnimationAudioController animationAudio;
+    public bool enableAnimationAudio = true;
+
 
     void Awake()
     {
@@ -185,8 +192,10 @@ public class PlayerController : MonoBehaviour
         UpdateMovement();
         UpdateShooting();
         UpdateAnimations();
+        UpdateAnimationAudio(); // ✅ ADD THIS LINE
         UpdateCooldowns();
     }
+
 
     // Input System callbacks
     void OnMoveInput(InputAction.CallbackContext context)
@@ -313,79 +322,35 @@ public class PlayerController : MonoBehaviour
         isShooting = true;
         shootCooldown = SHOOT_DURATION;
 
-        // Create bullet
-        if (bulletPrefab != null)
-        {
-            CreateBullet();
-        }
-        else
-        {
-            // Fallback: create simple bullet
-            CreateSimpleBullet();
-        }
+        // Create bullet from prefab
+        CreateBulletFromPrefab();
 
         Debug.Log($"Shot fired! Bullets remaining: {bulletsInCurrentClip}");
     }
 
-    void CreateBullet()
+    // ✅ NEW METHOD: Create bullet from prefab
+    void CreateBulletFromPrefab()
     {
+        if (bulletPrefab == null)
+        {
+            Debug.LogError("❌ Bullet prefab is not assigned!");
+            return;
+        }
+
+        // Instantiate bullet from prefab
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
 
-        // Add Bullet script if it doesn't have one
+        // Initialize bullet
         Bullet bulletScript = bullet.GetComponent<Bullet>();
-        if (bulletScript == null)
+        if (bulletScript != null)
         {
-            bulletScript = bullet.AddComponent<Bullet>();
+            bulletScript.Initialize(lastFacingDirection, bulletSpeed, enemyLayerMask);
+            Debug.Log($"🔫 Bullet prefab created at {firePoint.position} with direction {lastFacingDirection}");
         }
-
-        // Set bullet properties
-        bulletScript.Initialize(lastFacingDirection, bulletSpeed, enemyLayerMask);
-    }
-
-    void CreateSimpleBullet()
-    {
-        // Create a simple bullet GameObject
-        GameObject bullet = new GameObject("Bullet");
-        bullet.transform.position = firePoint.position;
-
-        // Add visual (yellow circle)
-        SpriteRenderer bulletRenderer = bullet.AddComponent<SpriteRenderer>();
-        bulletRenderer.sprite = CreateCircleSprite();
-        bulletRenderer.color = Color.yellow;
-        bullet.transform.localScale = Vector3.one * 0.2f;
-
-        // Add physics
-        Rigidbody2D bulletRb = bullet.AddComponent<Rigidbody2D>();
-        bulletRb.gravityScale = 0f;
-        bulletRb.linearVelocity = lastFacingDirection * bulletSpeed;
-
-        // Add collider
-        CircleCollider2D bulletCollider = bullet.AddComponent<CircleCollider2D>();
-        bulletCollider.isTrigger = true;
-
-        // Add bullet script
-        Bullet bulletScript = bullet.AddComponent<Bullet>();
-        bulletScript.Initialize(lastFacingDirection, bulletSpeed, enemyLayerMask);
-    }
-
-    Sprite CreateCircleSprite()
-    {
-        // Create a simple circle texture for bullet
-        Texture2D texture = new Texture2D(32, 32);
-        Color[] colors = new Color[32 * 32];
-
-        for (int i = 0; i < colors.Length; i++)
+        else
         {
-            int x = i % 32;
-            int y = i / 32;
-            float distance = Vector2.Distance(new Vector2(x, y), new Vector2(16, 16));
-            colors[i] = distance <= 16 ? Color.white : Color.clear;
+            Debug.LogError("❌ Bullet prefab missing Bullet script!");
         }
-
-        texture.SetPixels(colors);
-        texture.Apply();
-
-        return Sprite.Create(texture, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
     }
 
     Vector2 GetCollisionAvoidedMovement(Vector2 intendedMovement)
@@ -538,7 +503,41 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Manual attack performed! Facing direction: {lastFacingDirection}");
     }
 
+    void UpdateAnimationAudio()
+    {
+        if (!enableAnimationAudio || animationAudio == null) return;
+
+        // Movement audio
+        if (isMoving && !isReloading)
+        {
+            animationAudio.OnMovementStateChanged(true, isRunning);
+        }
+        else if (!isMoving && !isAttacking && !isShooting && !isReloading)
+        {
+            animationAudio.OnMovementStateChanged(false, false);
+        }
+
+        // Action audio
+        if (isAttacking && attackCooldown == ATTACK_DURATION)
+        {
+            animationAudio.PlayAttackAudio();
+        }
+
+        if (isShooting && shootCooldown == SHOOT_DURATION)
+        {
+            animationAudio.PlayShootAudio();
+        }
+
+        if (isReloading && reloadCooldown == RELOAD_DURATION)
+        {
+            animationAudio.PlayReloadAudio();
+        }
+    }
+
+
     // Health system methods
+
+
     public void TakeDamage(float damage, string source = "Unknown")
     {
         if (healthSystem != null)
@@ -546,13 +545,44 @@ public class PlayerController : MonoBehaviour
             bool damaged = healthSystem.TakeDamage(damage, source);
             if (damaged)
             {
+                if (animationAudio != null) animationAudio.PlayTakeDamageAudio();
+
                 // Add invulnerability after taking damage
                 healthSystem.SetInvulnerable(invulnerabilityDuration);
 
-                Debug.Log($"Player took {damage} damage from {source}");
+                Debug.Log($"🛑 Player took {damage} damage from {source}");
+
+                // ✅ CAMERA SHAKE
+                StartCoroutine(ShakeCamera(0.2f, 0.2f));
+
+                // ✅ DEVICE VIBRATION (if mobile)
+    #if UNITY_ANDROID || UNITY_IOS
+                Handheld.Vibrate();
+    #endif
             }
         }
     }
+    IEnumerator ShakeCamera(float duration, float magnitude)
+    {
+        Transform camTransform = Camera.main.transform;
+        Vector3 originalPos = camTransform.localPosition;
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float x = Random.Range(-2f, 2f) * magnitude;
+            float y = Random.Range(-2f, 2f) * magnitude;
+
+            camTransform.localPosition = originalPos + new Vector3(x, y, 0f);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        camTransform.localPosition = originalPos;
+    }
+
 
     public void DecreaseLightIntensity(float decreaseAmount = 1f)
     {

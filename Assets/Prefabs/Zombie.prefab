@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1722859942990277956
+--- !u!1 &8378364601863501662
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,26 +8,33 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1129829285545317134}
-  - component: {fileID: 1505688199407132133}
-  - component: {fileID: 8955623166303986742}
-  - component: {fileID: 2283036630962133085}
-  - component: {fileID: 9178289219698061795}
-  - component: {fileID: 3346868604031729491}
+  - component: {fileID: 5782590157239157264}
+  - component: {fileID: 1154725857600733525}
+  - component: {fileID: 308549499338513209}
+  - component: {fileID: 2620827572287499197}
+  - component: {fileID: 5382385706226999988}
+  - component: {fileID: 227868132607425536}
+  - component: {fileID: 2395941858621622195}
+  - component: {fileID: 6206416621391293360}
+  - component: {fileID: 2285945622050692917}
+  - component: {fileID: 5779183354403794745}
+  - component: {fileID: 7386277267573630616}
+  - component: {fileID: 2665134392943667549}
+  - component: {fileID: 3166357668967602961}
   m_Layer: 7
   m_Name: Zombie
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_TagString: Enemy
+  m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1129829285545317134
+--- !u!4 &5782590157239157264
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722859942990277956}
+  m_GameObject: {fileID: 8378364601863501662}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -16.633871, y: 3.67206, z: 0}
@@ -36,13 +43,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &1505688199407132133
+--- !u!212 &1154725857600733525
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722859942990277956}
+  m_GameObject: {fileID: 8378364601863501662}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -91,14 +98,14 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &8955623166303986742
+--- !u!95 &308549499338513209
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722859942990277956}
+  m_GameObject: {fileID: 8378364601863501662}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 87c122dbaac8029429ac791f1a3b6160, type: 2}
@@ -113,13 +120,13 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &2283036630962133085
+--- !u!114 &2620827572287499197
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722859942990277956}
+  m_GameObject: {fileID: 8378364601863501662}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
@@ -165,38 +172,31 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
---- !u!114 &9178289219698061795
+--- !u!114 &5382385706226999988
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722859942990277956}
+  m_GameObject: {fileID: 8378364601863501662}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51c3c2bc1cfc8b449af60e542d353128, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRadius: 5
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
   moveSpeed: 2
-  rotationSpeed: 180
-  spawnAreaSize: {x: 20, y: 15}
-  despawnDistance: 25
-  despawnTime: 10
+  detectionRange: 5
+  playerDetected: 0
+  distanceToPlayer: 0
   player: {fileID: 0}
-  timeAwayFromPlayer: 0
-  isAwayFromPlayer: 0
---- !u!50 &3346868604031729491
+--- !u!50 &227868132607425536
 Rigidbody2D:
   serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722859942990277956}
+  m_GameObject: {fileID: 8378364601863501662}
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
@@ -216,3 +216,220 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &2395941858621622195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8378364601863501662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b612742e492a68e46809e7a7d90342ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 10
+  currentHealth: 0
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealthPercentChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealing:
+    m_PersistentCalls:
+      m_Calls: []
+  isDead: 0
+  isInvulnerable: 0
+  invulnerabilityDuration: 0
+--- !u!114 &6206416621391293360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8378364601863501662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8e80d911ebdb544a637d6c3afc54dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 0}
+  zombieType: Normal
+  deathAnimationDuration: 2
+  deathEffect: {fileID: 0}
+  deathSound: {fileID: 0}
+  animationAudio: {fileID: 0}
+  enableAnimationAudio: 1
+  idleAudioInterval: 5
+--- !u!114 &2285945622050692917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8378364601863501662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5daf415e07ed3439ede6c45570dd2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackDamage: 1
+  attackCooldown: 1
+  attackRange: 1.5
+  zombieType: Normal
+  lightDecreaseAmount: 1
+  explosionRadius: 5
+  veryNearRadius: 1.5
+  midNearRadius: 3
+  farRadius: 5
+  veryNearDamage: 5
+  midNearDamage: 3
+  farDamage: 1
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  useExistingCollider: 1
+  lastAttackTime: 0
+  playerInRange: 0
+  currentDistanceToPlayer: 0
+--- !u!70 &5779183354403794745
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8378364601863501662}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.00000023841858, y: 0}
+  m_Size: {x: 0.3, y: 0.8}
+  m_Direction: 0
+--- !u!114 &7386277267573630616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8378364601863501662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b612742e492a68e46809e7a7d90342ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 10
+  currentHealth: 0
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealthPercentChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealing:
+    m_PersistentCalls:
+      m_Calls: []
+  isDead: 0
+  isInvulnerable: 0
+  invulnerabilityDuration: 0
+--- !u!114 &2665134392943667549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8378364601863501662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8e80d911ebdb544a637d6c3afc54dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 308549499338513209}
+  zombieType: Normal
+  deathAnimationDuration: 2
+  deathEffect: {fileID: 0}
+  deathSound: {fileID: 0}
+  animationAudio: {fileID: 3166357668967602961}
+  enableAnimationAudio: 1
+  idleAudioInterval: 5
+--- !u!114 &3166357668967602961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8378364601863501662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 031b5550abb77ea459d4dbc83520d61f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterType: Normal
+  primaryAudioSource: {fileID: 0}
+  secondaryAudioSource: {fileID: 0}
+  animationAudios:
+  - animationName: Idle
+    audioClip: {fileID: 8300000, guid: e2c18a985109f4e43b9ea27390de255b, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    randomizePitch: 0
+    pitchVariation: 0.051
+    delayBeforePlay: 0
+    interruptible: 0
+  - animationName: Death
+    audioClip: {fileID: 8300000, guid: 745903246e95fea49acd0bb37df06241, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    randomizePitch: 0
+    pitchVariation: 0.051
+    delayBeforePlay: 0
+    interruptible: 0
+  - animationName: Walk
+    audioClip: {fileID: 8300000, guid: be40ec322a48cde4bb672ae29dab5d25, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    randomizePitch: 0
+    pitchVariation: 0.051
+    delayBeforePlay: 0
+    interruptible: 0
+  showDebugLogs: 1
+  showAudioVisualizer: 0

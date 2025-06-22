@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
@@ -39,42 +39,62 @@ public class Bullet : MonoBehaviour
         // Rotate bullet to face movement direction
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+        Debug.Log($"Bullet initialized: Direction={direction}, Speed={speed}, TargetLayer={targetLayer.value}");
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // Check if hit enemy
+        Debug.Log($"🔥 BULLET COLLISION: {other.name} (layer {other.gameObject.layer}={LayerMask.LayerToName(other.gameObject.layer)}) - My layer: {gameObject.layer}");
+        Debug.Log($"🔥 Target layer mask: {targetLayer.value} - Layer check: {(targetLayer.value & (1 << other.gameObject.layer)) > 0}");
+
+        // ✅ ENHANCED COMPONENT CHECK
+        HealthSystem healthCheck = other.GetComponent<HealthSystem>();
+        Debug.Log($"🔍 Target has HealthSystem: {healthCheck != null}");
+
+        // Skip self-collision (bullets hitting bullets)
+        if (other.gameObject.layer == 8) // Bullets layer
+        {
+            Debug.Log("⚠️ Bullet hit another bullet - ignoring");
+            return;
+        }
+
+        // Check if hit enemy (layer 6 - Zombies)
         if ((targetLayer.value & (1 << other.gameObject.layer)) > 0)
         {
-            Debug.Log($"Bullet hit enemy: {other.name}");
+            Debug.Log($"✅ Bullet hit enemy: {other.name} on layer {other.gameObject.layer}");
 
-            // Try to damage using HealthSystem first
             HealthSystem enemyHealth = other.GetComponent<HealthSystem>();
             if (enemyHealth != null)
             {
-                enemyHealth.TakeDamage(damage, "Bullet");
-                Debug.Log($"Dealt {damage} damage to {other.name} using HealthSystem");
+                bool damaged = enemyHealth.TakeDamage(damage, "Bullet");
+                Debug.Log($"✅ Dealt {damage} damage to {other.name}. Success: {damaged}. Health: {enemyHealth.CurrentHealth}/{enemyHealth.MaxHealth}");
             }
             else
             {
-                // Fallback: Destroy enemy without health system
-                Debug.Log($"Enemy {other.name} has no HealthSystem, destroying directly");
-                Destroy(other.gameObject);
+                Debug.LogError($"❌ Enemy {other.name} has no HealthSystem component!");
             }
 
             DestroyBullet();
         }
-        // Check if hit wall
-        else if (other.gameObject.layer == 5) // Walls layer
+        // Check if hit wall (layer 5 - Walls)
+        else if (other.gameObject.layer == 5)
         {
-            Debug.Log("Bullet hit wall");
+            Debug.Log($"🧱 Bullet hit wall: {other.name}");
             DestroyBullet();
+        }
+        else
+        {
+            Debug.Log($"❓ Bullet hit unknown object: {other.name} on layer {other.gameObject.layer}");
         }
     }
 
+
+
+
     void DestroyBullet()
     {
-        // You can add bullet impact effects here
+        Debug.Log("💥 Bullet destroyed");
         Destroy(gameObject);
     }
 }

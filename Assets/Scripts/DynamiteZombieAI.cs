@@ -1,13 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DynamiteZombieAI : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float moveSpeed = 3f;
-    public float detectionRange = 6f;
+    public float moveSpeed = 4f; // ✅ Slightly faster than normal zombies
+    public float detectionRange = 8f; // ✅ INCREASED detection range
 
     [Header("Explosion Settings")]
-    public float explosionRange = 2f;
+    public float explosionRange = 4f; // ✅ INCREASED explosion range
     public GameObject explosionEffectPrefab;
 
     [Header("Debug Info")]
@@ -15,7 +15,6 @@ public class DynamiteZombieAI : MonoBehaviour
     [SerializeField] private float distanceToPlayer = 0f;
     [SerializeField] private bool isExploding = false;
 
-    // FIXED: Made player public so MultiZombieSpawner can access it
     [HideInInspector] public PlayerController player;
     private Transform playerTransform;
     private Rigidbody2D rb2d;
@@ -25,18 +24,15 @@ public class DynamiteZombieAI : MonoBehaviour
 
     void Start()
     {
-        // Get components
         rb2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
-        // Initialize Rigidbody2D settings
         if (rb2d != null)
         {
             rb2d.gravityScale = 0f;
             rb2d.freezeRotation = true;
         }
 
-        // Find player if not already set by spawner
         if (player == null)
         {
             player = FindFirstObjectByType<PlayerController>();
@@ -47,7 +43,7 @@ public class DynamiteZombieAI : MonoBehaviour
             playerTransform = player.transform;
         }
 
-        Debug.Log($"{gameObject.name} dynamite zombie AI initialized");
+        Debug.Log($"✅ {gameObject.name} dynamite zombie AI initialized - Explosion range: {explosionRange}");
     }
 
     void Update()
@@ -67,13 +63,11 @@ public class DynamiteZombieAI : MonoBehaviour
 
         if (playerDetected)
         {
-            // Calculate direction to player
             movementDirection = (playerTransform.position - transform.position).normalized;
             isMoving = true;
         }
         else
         {
-            // Stop moving when player is out of range
             movementDirection = Vector2.zero;
             isMoving = false;
         }
@@ -81,9 +75,9 @@ public class DynamiteZombieAI : MonoBehaviour
 
     void CheckForExplosion()
     {
-        // Explode when close to player
         if (playerDetected && distanceToPlayer <= explosionRange)
         {
+            Debug.Log($"🧨 Dynamite zombie {gameObject.name} triggered explosion at distance {distanceToPlayer:F1}");
             TriggerExplosion();
         }
     }
@@ -94,24 +88,63 @@ public class DynamiteZombieAI : MonoBehaviour
 
         isExploding = true;
 
-        Debug.Log($"Dynamite zombie {gameObject.name} is exploding!");
+        Debug.Log($"💥 Dynamite zombie {gameObject.name} is exploding!");
 
-        // Create explosion effect if prefab exists
         if (explosionEffectPrefab != null)
         {
             Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
         }
 
-        // Get the ZombieAttack component and trigger explosion damage
+        // ✅ ENHANCED: Try multiple methods to deal damage
         ZombieAttack zombieAttack = GetComponent<ZombieAttack>();
         if (zombieAttack != null)
         {
+            Debug.Log("✅ Found ZombieAttack component - calling ExplodeDynamiteZombie()");
             zombieAttack.ExplodeDynamiteZombie();
         }
         else
         {
-            // Fallback: Just destroy the zombie
+            Debug.LogWarning("❌ No ZombieAttack component found - applying direct damage");
+            // ✅ FALLBACK: Deal damage directly
+            ApplyExplosionDamageDirectly();
             Destroy(gameObject);
+        }
+    }
+
+    // ✅ NEW: Fallback damage method
+    void ApplyExplosionDamageDirectly()
+    {
+        if (player == null) return;
+
+        float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
+        int explosionDamage = 0;
+        string damageRange = "";
+
+        // Damage based on distance (same logic as ZombieAttack)
+        if (distanceToPlayer <= 1.5f) // Very near
+        {
+            explosionDamage = 5;
+            damageRange = "Very Near";
+        }
+        else if (distanceToPlayer <= 3f) // Mid near
+        {
+            explosionDamage = 3;
+            damageRange = "Mid Near";
+        }
+        else if (distanceToPlayer <= 5f) // Far
+        {
+            explosionDamage = 1;
+            damageRange = "Far";
+        }
+
+        if (explosionDamage > 0)
+        {
+            player.TakeDamage(explosionDamage, $"{gameObject.name} (Dynamite Explosion - {damageRange})");
+            Debug.Log($"💥 DIRECT DAMAGE: Dynamite zombie dealt {explosionDamage} damage ({damageRange}) at distance {distanceToPlayer:F1}");
+        }
+        else
+        {
+            Debug.Log($"💥 Explosion too far: Distance {distanceToPlayer:F1} > 5f - no damage");
         }
     }
 
@@ -121,12 +154,10 @@ public class DynamiteZombieAI : MonoBehaviour
 
         if (isMoving && playerDetected)
         {
-            // Move towards player (faster than normal zombies)
             rb2d.linearVelocity = movementDirection * moveSpeed;
         }
         else
         {
-            // Stop movement
             rb2d.linearVelocity = Vector2.zero;
         }
     }
@@ -135,7 +166,6 @@ public class DynamiteZombieAI : MonoBehaviour
     {
         if (animator == null) return;
 
-        // Set animation parameters
         animator.SetBool("IsMoving", isMoving && !isExploding);
         animator.SetBool("IsExploding", isExploding);
         animator.SetFloat("MoveX", movementDirection.x);
@@ -152,7 +182,14 @@ public class DynamiteZombieAI : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, explosionRange);
 
-        // Draw line to player when detected
+        // ✅ Draw damage ranges
+        Gizmos.color = Color.orange;
+        Gizmos.DrawWireSphere(transform.position, 1.5f); // Very near (5 damage)
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, 3f);   // Mid near (3 damage)
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, 5f);   // Far (1 damage)
+
         if (playerDetected && playerTransform != null)
         {
             Gizmos.color = Color.red;

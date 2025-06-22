@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ZombieAnimationController : MonoBehaviour
 {
@@ -14,6 +14,16 @@ public class ZombieAnimationController : MonoBehaviour
     private HealthSystem healthSystem;
     private AudioSource audioSource;
     private bool isDead = false;
+
+
+    [Header("🎵 Animation Audio")]
+    public AnimationAudioController animationAudio;
+    public bool enableAnimationAudio = true;
+
+    [Header("Audio Settings")]
+    public float idleAudioInterval = 5f; // Play idle sound every 5 seconds
+    private float lastIdleAudioTime = 0f;
+
 
     void Start()
     {
@@ -86,6 +96,28 @@ public class ZombieAnimationController : MonoBehaviour
         animator.SetBool("IsMoving", isMoving);
         animator.SetFloat("MoveX", velocity.x);
         animator.SetFloat("MoveY", velocity.y);
+        UpdateZombieAudio(isMoving);
+
+    }
+    void UpdateZombieAudio(bool isMoving)
+    {
+        if (!enableAnimationAudio || animationAudio == null || isDead) return;
+
+        if (isMoving)
+        {
+            animationAudio.OnMovementStateChanged(true, false);
+        }
+        else
+        {
+            // Play idle sounds occasionally
+            if (Time.time - lastIdleAudioTime >= idleAudioInterval)
+            {
+                animationAudio.PlayIdleAudio();
+                lastIdleAudioTime = Time.time;
+            }
+
+            animationAudio.OnMovementStateChanged(false, false);
+        }
     }
 
     public void OnTakeDamage()
@@ -94,6 +126,7 @@ public class ZombieAnimationController : MonoBehaviour
 
         // Trigger hurt animation
         animator.SetTrigger("TakeDamage");
+        if (animationAudio != null) animationAudio.PlayTakeDamageAudio();
 
         Debug.Log($"{gameObject.name} played hurt animation");
     }
@@ -103,6 +136,7 @@ public class ZombieAnimationController : MonoBehaviour
         if (isDead) return;
 
         isDead = true;
+        if (animationAudio != null) animationAudio.PlayDeathAudio();
 
         Debug.Log($"{gameObject.name} starting death sequence");
 
